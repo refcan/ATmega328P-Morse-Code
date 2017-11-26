@@ -22,3 +22,4 @@
     ;; TODO: Letters!
 
     CHAR_ERROR = ~(_BV(SEG_G)) ; using dash in the middle as error pattern
+	CHAR_A = ~(_BV(SEG_A))
