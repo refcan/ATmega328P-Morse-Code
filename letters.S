@@ -33,9 +33,9 @@
 	CHAR_H = ~(_BV(SEG_B) | _BV(SEG_C) | _BV(SEG_E) | _BV(SEG_F) | _BV(SEG_G) )
 	CHAR_I = ~(_BV(SEG_E) | _BV(SEG_F) )
 	CHAR_J = ~(_BV(SEG_B) | _BV(SEG_C) | _BV(SEG_D) | _BV(SEG_E) | )
-	CHAR_K = ???
+	CHAR_K = ~(_BV(SEG_B) | _BV(SEG_D) | _BV(SEG_E) | _BV(SEG_F) | _BV(SEG_G) ) ;; Strange
 	CHAR_L = ~(_BV(SEG_D) | _BV(SEG_E) | _BV(SEG_F) | )
-	CHAR_M = ???
+	CHAR_M = ~(_BV(SEG_A) | _BV(SEG_C) | _BV(SEG_E) | ) ;; Strange
 	CHAR_N = ~(_BV(SEG_A) | _BV(SEG_B) | _BV(SEG_C) | _BV(SEG_E) | _BV(SEG_F) )
 	CHAR_O = ~(_BV(SEG_A) | _BV(SEG_B) | _BV(SEG_C) | _BV(SEG_D) | _BV(SEG_E) | _BV(SEG_F) )
 	CHAR_P = ~(_BV(SEG_A) | _BV(SEG_B) |  _BV(SEG_E) | _BV(SEG_F) | _BV(SEG_G) )
@@ -45,7 +45,7 @@
 	CHAR_T = ~(_BV(SEG_D) | _BV(SEG_E) | _BV(SEG_F) | _BV(SEG_G) ) 
 	CHAR_U = ~(_BV(SEG_B) | _BV(SEG_C) | _BV(SEG_D) | _BV(SEG_E) | _BV(SEG_F) )
 	CHAR_V = ~(_BV(SEG_C) | _BV(SEG_D) | _BV(SEG_E) )
-	CHAR_W = ???
-	CHAR_X = ???
+	CHAR_W = ~(_BV(SEG_B) | _BV(SEG_D) | _BV(SEG_F) ) ;; Strange
+	CHAR_X = ~(_BV(SEG_C) | _BV(SEG_F) | _BV(SEG_G) ) ;; Strange
 	CHAR_Y = ~(_BV(SEG_B) | _BV(SEG_C) | _BV(SEG_D) | _BV(SEG_F) | _BV(SEG_G) )
 	CHAR_Z = ~(_BV(SEG_A) | _BV(SEG_B) | _BV(SEG_D) | _BV(SEG_E) | _BV(SEG_G) )
