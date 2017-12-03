@@ -44,12 +44,7 @@ loop:
     cp r22, r24      ; check if the morse code value is the same too
     brne incr
 
-    add r30, r20    ; if this line is reached we've found what we're looking for, time to display
-    brcc 1f
-    inc r31
-
-1:  lpm r24, Z
-    rjmp end
+    rjmp display     ; if this line is reached we've found what we're looking for, time to display
 
 incr:
     cpi r20, 26     ; check if this is the end of the loop and we haven't found anything
@@ -60,6 +55,15 @@ incr:
 1:  inc r20         ; increment r20 and then go through the loop again
     rjmp loop
 
+display:
+    ldi r30, lo8(letter_table) ; Z pointer was altered to look through the table, reset it
+	ldi r31, hi8(letter_table) 
+    add r30, r20    ; add the offset
+    brcc 1f
+    inc r31
+
+1:  lpm r24, Z
+    rjmp end
 
 end:
     ;; restoring the registers
