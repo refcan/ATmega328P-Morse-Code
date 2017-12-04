@@ -2,14 +2,12 @@
 ;;; File to parse the input and display the right letter on screen
 ;;; REFERENCES:
 ;;; TODO
-
+#include <avr/io.h>
 #include "letters.S"
 
-.global parse_input
-
 ;; Convert a digit from some register into 7seg data
+.global parse_input
 parse_input:
-
     ;; Error Handling
     cpi r25, 5     ; maximum length for a morse code letter is 4
     breq error

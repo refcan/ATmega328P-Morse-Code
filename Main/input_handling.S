@@ -2,7 +2,7 @@
 ;;; File to handle the input (interrupts and timers!)
 ;;; REFERENCES:
 ;;; TODO
-
+#include <avr/io.h>
 #include "parse_input.S"
 
 ;;; Constants (TODO: Might be redundant?)

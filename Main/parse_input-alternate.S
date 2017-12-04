@@ -2,14 +2,12 @@
 ;;; File to parse the input and display the right letter on screen
 ;;; REFERENCES:
 ;;; TODO
-
+#include <avr/io.h>
 #include "letters.S"
 
-.global parse_input
-
 ;; Convert a digit from some register into 7seg data
+.global parse_input
 parse_input:
-
     ;; saving the registers we'll be using
     push r20
     push r21
