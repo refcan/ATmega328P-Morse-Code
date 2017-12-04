@@ -4,7 +4,7 @@ PRG = group_14
 # add to this line the names of other source code files that contain code for your project
 # but replace suffix .S with .o, eg display.S would become display.o as in
 # OBJ = $(PRG).o init.o display.o
-OBJ = $(PRG).o init.o
+OBJ = $(PRG).o init.o input_handling.o parse_input.o
 
 ### NO NEED TO EDIT BEYOND THIS LINE!
 
