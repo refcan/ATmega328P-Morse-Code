@@ -18,6 +18,8 @@
 	GAP_DECISION_LIMIT = 4 * TICKS_PER_SEC / 10   ; 400ms decision limit between inter-signal and inter-letter gap
 	INPUT_DECISION_LIMIT = 2 * TICKS_PER_SEC / 10 ; 200ms decision limit between dot and dash input | TODO: Might be redundant?
 
+	BUTTON = 0
+
 ;;; user code starts from here, as init.S ends with jmp main:
 
 	.global main 		; declaring main global, so it can be used in other files
