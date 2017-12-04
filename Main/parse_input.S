@@ -109,111 +109,111 @@ s110:
 
 ;; Loading the characters to the display
 letter_a:
-    lpm r24, CHAR_A
+    ldi r24, CHAR_A
     rjmp end
 
 letter_b:
-    lpm r24, CHAR_B
+    ldi r24, CHAR_B
     rjmp end
 
 letter_c:
-    lpm r24, CHAR_C
+    ldi r24, CHAR_C
     rjmp end
 
 letter_d:
-    lpm r24, CHAR_D
+    ldi r24, CHAR_D
     rjmp end
 
 letter_e:
-    lpm r24, CHAR_E
+    ldi r24, CHAR_E
     rjmp end
 
 letter_f:
-    lpm r24, CHAR_F
+    ldi r24, CHAR_F
     rjmp end
 
 letter_g:
-    lpm r24, CHAR_G
+    ldi r24, CHAR_G
     rjmp end
 
 letter_h:
-    lpm r24, CHAR_H
+    ldi r24, CHAR_H
     rjmp end
 
 letter_i:
-    lpm r24, CHAR_I
+    ldi r24, CHAR_I
     rjmp end
 
 letter_j:
-    lpm r24, CHAR_J
+    ldi r24, CHAR_J
     rjmp end
 
 letter_k:
-    lpm r24, CHAR_K
+    ldi r24, CHAR_K
     rjmp end
 
 letter_l:
-    lpm r24, CHAR_L
+    ldi r24, CHAR_L
     rjmp end
 
 letter_m:
-    lpm r24, CHAR_M
+    ldi r24, CHAR_M
     rjmp end
 
 letter_n:
-    lpm r24, CHAR_N
+    ldi r24, CHAR_N
     rjmp end
 
 letter_o:
-    lpm r24, CHAR_O
+    ldi r24, CHAR_O
     rjmp end
 
 letter_p:
-    lpm r24, CHAR_P
+    ldi r24, CHAR_P
     rjmp end
 
 letter_q:
-    lpm r24, CHAR_Q
+    ldi r24, CHAR_Q
     rjmp end
 
 letter_r:
-    lpm r24, CHAR_R
+    ldi r24, CHAR_R
     rjmp end
 
 letter_s:
-    lpm r24, CHAR_S
+    ldi r24, CHAR_S
     rjmp end
 
 letter_t:
-    lpm r24, CHAR_T
+    ldi r24, CHAR_T
     rjmp end
 
 letter_u:
-    lpm r24, CHAR_U
+    ldi r24, CHAR_U
     rjmp end
 
 letter_v:
-    lpm r24, CHAR_V
+    ldi r24, CHAR_V
     rjmp end
 
 letter_w:
-    lpm r24, CHAR_W
+    ldi r24, CHAR_W
     rjmp end
 
 letter_x:
-    lpm r24, CHAR_X
+    ldi r24, CHAR_X
     rjmp end
 
 letter_y:
-    lpm r24, CHAR_Y
+    ldi r24, CHAR_Y
     rjmp end
 
 letter_z:
-    lpm r24, CHAR_Z
+    ldi r24, CHAR_Z
     rjmp end
 
 error:
-    lpm r24, CHAR_ERROR ; Display the Error pattern to the display
+    ldi r24, CHAR_ERROR ; Display the Error pattern to the display
     rjmp end
 
 end:
