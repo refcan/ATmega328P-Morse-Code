@@ -80,7 +80,7 @@ loop:
     sbi PORTB, 5    ; turn on bit 5 of portB
     dec length
 
-    sbis sequence, length
+    sbrs sequence, length
     ldi r24, DOT
     ldi r24, DASH
     rcall delay_cs
