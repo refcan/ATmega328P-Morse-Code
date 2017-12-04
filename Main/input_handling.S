@@ -2,7 +2,8 @@
 ;;; File to handle the input (interrupts and timers!)
 ;;; REFERENCES:
 ;;; TODO
-#include <avr/io.h>
+
+#include "parse_input.S"
 
 ;;; Constants (TODO: Might be redundant?)
 	CPU_FREQ = 16000000
@@ -24,8 +25,31 @@
 	.global timer1_compa_isr  ; export the symbol
 	
 timer1_compa_isr:
-    nop                       ; TODO interrupt! This interrupt handles what happens when enougoh time has passed after last button press or release.
+                     ; TODO interrupt! This interrupt handles what happens when enough time has passed after last button press or release.
+	push r16
+	in r16, SREG
+	push r16
 
+	lds r16, TCCR1B
+	sbrs, ICES1
+	rjmp awaiting_press
+
+awaiting_release:
+
+	ser r19
+
+	rjmp 1f
+
+awaiting_press:
+
+	ldi r16, _BV(BUTTON)
+	out PORTB, r16
+
+	pop r16
+	out SREG, r16 	
+	pop r16
+
+	reti
 ;;; cTODO
 
     .global timer1_cpt_isr ; export the symbol
