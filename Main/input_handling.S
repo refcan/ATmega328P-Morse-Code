@@ -3,7 +3,6 @@
 ;;; REFERENCES:
 ;;; TODO
 #include <avr/io.h>
-#include "parse_input.S"
 
 ;;; Constants (TODO: Might be redundant?)
 	CPU_FREQ = 16000000
