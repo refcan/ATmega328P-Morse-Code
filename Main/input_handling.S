@@ -31,7 +31,7 @@ timer1_compa_isr:
 	push r16
 
 	lds r16, TCCR1B
-	sbrs, ICES1
+	sbrs r16, ICES1
 	rjmp awaiting_press
 
 awaiting_release:
@@ -45,7 +45,11 @@ awaiting_press:
 	ldi r16, _BV(BUTTON)
 	out PORTB, r16
 
-	pop r16
+	rcall parse_input
+	clr r25
+	out PORTD, r24
+
+1:	pop r16
 	out SREG, r16 	
 	pop r16
 
@@ -55,10 +59,71 @@ awaiting_press:
     .global timer1_cpt_isr ; export the symbol
 
 timer1_cpt_isr:
-    nop                       ; TODO interrupt! Interrupt to time button presses
+                    ; TODO interrupt! Interrupt to time button presses
+push r8
+
+	in r8, SREG 	
+	push r8
+
+	lds r8, ICR1L		
+	lds r8, ICR1H           
+	push r17				
+
+
+	or r17, r8
+
+	mov r17,r19		
+	or r17,r8		
+	breq debounce	
+
+
+
+	clr r17
+	sts TCNT1H, r17 	
+	sts TCNT1L, r17		
+	lds r17, TCCR1B
+	sbrs  r17, ICES1
+	
+	rcall released
+
+	andi r17, ~(_BV(ICES1))
+	rjmp end_isr
+
+	
+pressed:
+
+	ori r17, _BV(ICES1)
+
+end_isr:
+	sts TCCR1B, r17 	
+	
+debounce:
+	pop r17
+	pop r8
+	out SREG, r8		
+	pop r8
+
+	reti
+
 
 released:
-    nop
-    ;; here we parse button input, we'll check if press was long or short.
-    ;; if long -> store 1 in bit, else nothing
-    ;; either case increase bit tracking register
+
+	push r16
+
+	tst r19 
+
+	brne long_press		
+			
+	ldi r16, DECISION_LIMIT
+	cp r8,r16
+	brcs 1f
+
+long_press:
+	sbr r24, (1 << r25)
+	rjmp 1f
+
+1:	inc r25
+	
+	pop r16
+	clr r19			; clear overflow flag in case it was set
+	ret
