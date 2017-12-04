@@ -21,35 +21,42 @@
 	BUTTON = 0
 
 ;;; user code starts from here, as init.S ends with jmp main:
-
+	.section .text
 	.global main 		; declaring main global, so it can be used in other files
-main:
-	;; Setting up the button
-	sbi PORTB, BUTTON 	; DDRB0 an input by default, all we need to do is switch on the pull-up to be able to read button input since when button is pressed it sends a 0 signal.
-	
-	;; Setting up the timer
+main:	
+	;; Enable the bits for the 7 Segment display in PORT D
+	ldi r16, ALL_SEGS
+	out DDRD, r16
+
+	sbi PORTB, BUTTON 	; switch on the pull-up for the button.
+
+	;; set up the timer ([ATmega328p], Section 15.11.1 (p126))
 	clr r16
-	sts TCCR1A, r16		; Timer1 Output mode: no output
+	sts TCCR1A, r16 	; setting timer output mode: no output
+				; pin used, normal counting up. 
 
-	ldi r16, GAP_DECISION_LIMIT ; cTODO
-	sts OCR1AH, r16				; cTODO
+	ldi r16, GAP_DECISION_LIMIT
+	sts OCR1AH, r16
 
-	clr r16						; cTODO
-	sts OCR1AL, r16				; cTODO
-
-	ldi r16, _BV(ICIE1) | _BV(OCIE1A) ; enable input capture interrupt and compare match interrupt on Timer1
+	clr r16
+	sts OCR1AL, r16
+	
+	;; enable input capture interrupt (to time button presses) and
+	;; timer overflow interrupt (the time-out to switch on the
+	;; yellow LED:
+	ldi r16, _BV(ICIE1) | _BV(OCIE1A)
 	sts TIMSK1, r16
 
-	ldi r16,  _BV(ICNC1) | _BV(CS12) | _BV(CS10) | _BV(WGM12) ; enable noise canceler, set time prescaler to 1024, start timer in CTC mode.
-	sts TCCR1B, r16 ; TODO what is CTC mode
+	;; enable noise canceller, set prescaler to 1024, and start
+	;; timer in normal mode, [ATmega328p] section 12.11.2 (p128).
+	ldi r16,  _BV(ICNC1) | _BV(WGM12) | _BV(CS12) | _BV(CS10)
+	sts TCCR1B, r16
 
-	;; Setting up the output
-	ldi r24, CHAR_ERROR
-	out DDRD, r24 ; cTODO
+	clr r19			; reset overflow flag to defined state
 
-	;; Additional Setup
-	clr r19 ; We are using Register 19 to indicate whether or not a timer overflow has happened, therefore we initialise it by clearing it. 
-
-	sei		; Global Interrupt Enable
-
-wait: rjmp wait	; idling, waiting for interrupts to happen
+	sei				; enable interrupts globally.
+	ldi r16, CHAR_ERROR 	; turn on the error character for startup
+	out PORTD, r16
+	
+wait:
+	rjmp wait 		; wait for interrupts!

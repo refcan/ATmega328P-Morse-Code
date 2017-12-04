@@ -3,155 +3,136 @@
 ;;; REFERENCES:
 ;;; TODO
 #define __SFR_OFFSET 0
-#include <avr/io.h>
+	#include <avr/io.h>
+	#include "letters.S"
 
 ;;; Constants (TODO: Might be redundant?)
 	CPU_FREQ = 16000000
 	TICKS_PER_SEC = CPU_FREQ / (256 * 1024) ; 1000ms or 1 second
-	INPUT_DECISION_LIMIT = 2 * TICKS_PER_SEC / 10 ; 200ms decision limit between dot and dash input
 
 	GAP_DECISION_LIMIT = 4 * TICKS_PER_SEC / 10   ; 400ms decision limit between inter-signal and inter-letter gap
 	INPUT_DECISION_LIMIT = 2 * TICKS_PER_SEC / 10 ; 200ms decision limit between dot and dash input | TODO: Might be redundant?
 
 	BUTTON = 0
 
-;;;; IMPLEMENTATION IDEA
-;;;; -----------------------------------------------------------
-;;;; 1 register for current input going on, 1 register for current bit in the other register
-;;;; in cpt_isr, we are changing the bits accordingly as we go
-;;;; increase bit every time
-;;;; in compa_isr we tie things up and then call parse_input to display stuff.
+		.section .text	
+		.global timer1_compa_isr  ; export symbol to overwrite weak
+				; definition in init.S
 
-;;; cTODO vvvvvvvvvvv
-;;; This interrupt service routine is called whenever timer1 has
-;;; counted up to match the value stored in OCA1, ie when more then
-;;; GAP_DECISION_LIMIT time has elapses since the last button press or release.
-	
-	.global timer1_compa_isr  ; export the symbol
-	
-timer1_compa_isr:
-                     ; TODO interrupt! This interrupt handles what happens when enough time has passed after last button press or release.
-	push r16
-	in r16, SREG
+;;; This is the start of the interrupt service routine:
+timer1_compa_isr:			
+
+	push r16	
+	in r16, SREG		; save the status register.
 	push r16
 
+	;; check whether we are waiting for a button press or release:
 	lds r16, TCCR1B
-	sbrs r16, ICES1
+	sbrs r16, ICES1 	; skip if waiting for positive edge (ie for button release)
 	rjmp awaiting_press
 
 awaiting_release:
-
-	ser r19
-
+	;;  make sure also an overly long press is always recognised
+	;;  as a long press, irrespective of a timer overrun:
+	ser r19 		; using r19 as a flag to indicate a
+				; timer overflow has occured.
 	rjmp 1f
 
-awaiting_press:
-
-	ldi r16, _BV(BUTTON)
-	out PORTB, r16
-
-	rcall parse_input
-	clr r25
-	out PORTD, r24
-
+awaiting_press:	
+		
+	out PORTD, r20		; display whatever's loaded in r20
+	
 1:	pop r16
-	out SREG, r16 	
+	out SREG, r16 		; restore status register
 	pop r16
-
+	
 	reti
-;;; cTODO
 
-    .global timer1_cpt_isr ; export the symbol
-
+	.global timer1_cpt_isr
 timer1_cpt_isr:
-                    ; TODO interrupt! Interrupt to time button presses
-push r8
 
-	in r8, SREG 	
 	push r8
 
-	lds r8, ICR1L		
-	lds r8, ICR1H           
+	in r8, SREG 		; save the status register.
+	push r8
+
+	lds r8, ICR1L		; get the timer count when the capture event happened.
+	lds r8, ICR1H           ; we discard the low part, only
+				; interested in the high part, but
+				; reading low byte is necessary to get
+				; a correct high byte in ICR1H, see
+				; documentation [ATmega328p] Section 15.11.7 p131 
 	push r17				
 
+	;; debounce button:
 
-	or r17, r8
-
-	mov r17,r19		
-	or r17,r8		
-	breq debounce	
-
-
+	mov r17,r19		;  If there is no timer-overflow (ie a
+				;  very long button press and
+	or r17,r8		;  ICR1H is still zero, then 
+				;  less than 16ms have elapsed since
+				;  last release or press
+	breq debounce		;  and we do nothing
 
 	clr r17
-	sts TCNT1H, r17 	
-	sts TCNT1L, r17		
+	sts TCNT1H, r17 	; reset timer, first writing the high byte to the latch
+	sts TCNT1L, r17		; then the low byte -- Section 16.3 of [328] again.
+
+	;; check whether we were looking for a positive or a negative edge:
 	lds r17, TCCR1B
-	sbrs  r17, ICES1
+	sbrs  r17, ICES1	; skip next instruction if positive edge dedection.
 	
+	rjmp pressed		; we have a negative edge ie button
+				; has been pressed
+
+	;; positive edge, button has been released
 	rcall released
 
-	andi r17, ~(_BV(ICES1))
+	andi r17, ~(_BV(ICES1)) ; we have had positive edge, so next
+				; time looking for negative edge
 	rjmp end_isr
 
 	
 pressed:
-
-	ori r17, _BV(ICES1)
+	;; call depressed ; more code to execute, perhaps for the coursework?
+	ori r17, _BV(ICES1)	; next time detect positive edge, ie a
+				; button release.
+	ldi r16, ALL_SEGS
+	out PORTD, r16
 
 end_isr:
-	sts TCCR1B, r17 	
+	sts TCCR1B, r17 	; write r17 to TCCR1B to activate the
+				; change in edge detection.
 	
 debounce:
 	pop r17
 	pop r8
-	out SREG, r8		
+	out SREG, r8		; restore status register
 	pop r8
 
 	reti
-
 
 released:
 
 	push r16
 
-	tst r19 
+	tst r19 		; Did we have a timer overflow
+				; (ie more than TIMEOUT time since the
+				; last released of the button?
+	brne long_press		; if yes, then signal is a long
+				; press in any case
 
-	brne long_press		
-			
+	;; is the signal longer than INPUT_DECISION_LIMIT?
 	ldi r16, INPUT_DECISION_LIMIT
 	cp r8,r16
-	brcs 1f
-
+	brcs short_press
+	
 long_press:
-	rcall set_mask
+	ldi r20, CHAR_T
 	rjmp 1f
 
-1:	inc r25
-	
-	pop r16
+short_press:
+	ldi r20, CHAR_E
+
+1:	pop r16
 	clr r19			; clear overflow flag in case it was set
-	ret
-
-set_mask:
-	push r0
-	push r16
-	push r2
-
-	clr r0
-	ldi r16, 1
-	mov r2, r25
-
-loop:
-	cp r2, r0
-	breq l_done
-	add r16, r16 ; bit shift left
-	dec r2
-	rjmp loop
-
-l_done:
-	or r24, r16
-	pop r2
-	pop r16
-	pop r0
 	ret
