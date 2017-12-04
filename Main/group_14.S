@@ -44,7 +44,7 @@ main:
 	sts TCCR1B, r16 ; TODO what is CTC mode
 
 	;; Setting up the output
-	ldi r24, ALL_SEGS
+	ldi r24, CHAR_ERROR
 	out DDRD, r24 ; cTODO
 
 	;; Additional Setup

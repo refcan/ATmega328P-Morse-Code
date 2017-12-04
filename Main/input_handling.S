@@ -2,13 +2,18 @@
 ;;; File to handle the input (interrupts and timers!)
 ;;; REFERENCES:
 ;;; TODO
-
-#include "parse_input.S"
+#define __SFR_OFFSET 0
+#include <avr/io.h>
 
 ;;; Constants (TODO: Might be redundant?)
 	CPU_FREQ = 16000000
 	TICKS_PER_SEC = CPU_FREQ / (256 * 1024) ; 1000ms or 1 second
 	INPUT_DECISION_LIMIT = 2 * TICKS_PER_SEC / 10 ; 200ms decision limit between dot and dash input
+
+	GAP_DECISION_LIMIT = 4 * TICKS_PER_SEC / 10   ; 400ms decision limit between inter-signal and inter-letter gap
+	INPUT_DECISION_LIMIT = 2 * TICKS_PER_SEC / 10 ; 200ms decision limit between dot and dash input | TODO: Might be redundant?
+
+	BUTTON = 0
 
 ;;;; IMPLEMENTATION IDEA
 ;;;; -----------------------------------------------------------
@@ -114,16 +119,39 @@ released:
 
 	brne long_press		
 			
-	ldi r16, DECISION_LIMIT
+	ldi r16, INPUT_DECISION_LIMIT
 	cp r8,r16
 	brcs 1f
 
 long_press:
-	sbr r24, (1 << r25)
+	rcall set_mask
 	rjmp 1f
 
 1:	inc r25
 	
 	pop r16
 	clr r19			; clear overflow flag in case it was set
+	ret
+
+set_mask:
+	push r0
+	push r16
+	push r2
+
+	clr r0
+	ldi r16, 1
+	mov r2, r25
+
+loop:
+	cp r2, r0
+	breq l_done
+	add r16, r16 ; bit shift left
+	dec r2
+	rjmp loop
+
+l_done:
+	or r24, r16
+	pop r2
+	pop r16
+	pop r0
 	ret
