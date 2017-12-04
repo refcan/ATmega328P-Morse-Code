@@ -15,7 +15,7 @@
 	SEG_G = 6		; middle
 
     ;; Bit mask to turn off display
-	ALL_SEGS = _BV(SEG_A) | _BV(SEG_B) | _BV(SEG_C) | _BV(SEG_D) | _BV(SEG_E) | _BV(SEG_F) | _BV(SEG_G) 
+	ALL_SEGS = _BV(SEG_A) | _BV(SEG_B) | _BV(SEG_C) | _BV(SEG_D) | _BV(SEG_E) | _BV(SEG_F) | _BV(SEG_G)
 
     ;; The letter representations (digit rerpesentations inverted since the 7 segment display follows reverse logic)
     
@@ -32,7 +32,7 @@
 	CHAR_G = ~(_BV(SEG_A) | _BV(SEG_C) | _BV(SEG_D) | _BV(SEG_E) | _BV(SEG_F) )
 	CHAR_H = ~(_BV(SEG_B) | _BV(SEG_C) | _BV(SEG_E) | _BV(SEG_F) | _BV(SEG_G) )
 	CHAR_I = ~(_BV(SEG_E) | _BV(SEG_F) )
-	CHAR_J = ~(_BV(SEG_B) | _BV(SEG_C) | _BV(SEG_D) | _BV(SEG_E) | )
+	CHAR_J = ~(_BV(SEG_B) | _BV(SEG_C) | _BV(SEG_D) | _BV(SEG_E) )
 	CHAR_K = ~(_BV(SEG_B) | _BV(SEG_D) | _BV(SEG_E) | _BV(SEG_F) | _BV(SEG_G) ) ;; Strange
 	CHAR_L = ~(_BV(SEG_D) | _BV(SEG_E) | _BV(SEG_F) )
 	CHAR_M = ~(_BV(SEG_A) | _BV(SEG_C) | _BV(SEG_E) ) ;; Strange
@@ -42,7 +42,7 @@
 	CHAR_Q = ~(_BV(SEG_A) | _BV(SEG_B) | _BV(SEG_C) | _BV(SEG_F) | _BV(SEG_G) )
 	CHAR_R = ~(_BV(SEG_A) | _BV(SEG_E) | _BV(SEG_F) )
 	CHAR_S = ~(_BV(SEG_A) | _BV(SEG_C) | _BV(SEG_D) | _BV(SEG_F) | _BV(SEG_G) )
-	CHAR_T = ~(_BV(SEG_D) | _BV(SEG_E) | _BV(SEG_F) | _BV(SEG_G) ) 
+	CHAR_T = ~(_BV(SEG_D) | _BV(SEG_E) | _BV(SEG_F) | _BV(SEG_G) )
 	CHAR_U = ~(_BV(SEG_B) | _BV(SEG_C) | _BV(SEG_D) | _BV(SEG_E) | _BV(SEG_F) )
 	CHAR_V = ~(_BV(SEG_C) | _BV(SEG_D) | _BV(SEG_E) )
 	CHAR_W = ~(_BV(SEG_B) | _BV(SEG_D) | _BV(SEG_F) ) ;; Strange
