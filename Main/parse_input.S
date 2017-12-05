@@ -8,6 +8,8 @@
 #include "letters.S"
 
 ;; This subroutine converts the morse code pattern into its letter representation in the 7 segment display.
+;; Particularly it uses a pseudo 2-dimensional table and loops through it until it finds the values it seeks, and then returns the appropriate letter in r24
+;; If it can't find anything it returns the error pattern.
 
 ;; Input:
 ;; r24 = the morse code pattern saved as a bit pattern where 1 is a dash and 0 is a dot
@@ -28,32 +30,33 @@ parse_input:
 
     ;; loop through the table to find letter
 loop:
-    ldi r30, lo8(letter_table) ; make Z point to the table with the digits.
+    ldi r30, lo8(letter_table) ; make Z point to the table with the letters.
 	ldi r31, hi8(letter_table)
 
-    add r30, r20    ; r21 is the offset into the table
+    add r30, r20    ; r20 is the iterator but we're going to be using it as the original offset into the table as well.
     brcc 1f         ; if we have no overflow in low byte of Z pointer when adding the offset, continue
     inc r31         ; else add the overflow to the high byte of Z
 
-1:  lpm r21, Z      ; load data from the table to r22 for comparison purposes
+1:  lpm r21, Z      ; load data from the table to r21 for comparison purposes, since we don't want to modify the iterator
     cp r21, r25     ; compare pattern length
     brne incr       ; if it's not what we're looking for go to incr label
 
-    adiw r30, 26
+    adiw r30, 26    ; if it did match what we're looking for, add 26 to the Z pointer* to go to the next pseudo row with the bit pattern values
     lpm r21, Z
-    cp r21, r24      ; check if the morse code value is the same too
+    cp r21, r24     ; check if the bit pattern value is the same too
     brne incr
 
-    adiw r30, 26
-    lpm r24, Z
-    rjmp end
+    ;; If this little segment is reached we've found what we're looking for
+    adiw r30, 26    ; if we've found what we're looking for, go to the third pseudo row to get the 7segment representation
+    lpm r24, Z      ; and load it in r24
+    rjmp end        ; then end the subroutine
 
     ;; This label just handles what to do if we haven't found what we're looking for
 incr:
     cpi r20, 25     ; check if this is the end of the loop and we haven't found anything
     brne 1f
     ldi r24, CHAR_ERROR ; display error if we've iterated through the table and found nothing
-    rjmp end
+    rjmp end        ; end the subroutine
 
 1:  inc r20         ; increment r20 and then go through the loop again
     rjmp loop
