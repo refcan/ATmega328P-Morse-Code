@@ -3,9 +3,12 @@
 ;;; REFERENCES:
 ;;; [ATmega328p] Section 15.11.7 p131 - http://www.atmel.com/Images/Atmel-7810-Automotive-Microcontrollers-ATmega328P_Datasheet.pdf
 
-#define __SFR_OFFSET 0	; automatically subtracts 0x20 from I/O space addresses for compatibility
-#include <avr/io.h>		; including the standard symbol definitions of all ports
-#include "letters.S"	; import file with symbol definitions for the 7 segment display in order to turn off the display when the button is pressed
+; automatically subtracts 0x20 from I/O space addresses for compatibility
+#define __SFR_OFFSET 0
+; including the standard symbol definitions of all ports
+#include <avr/io.h>
+; import file with symbol definitions for the 7 segment display in order to turn off the display when the button is pressed
+#include "letters.S"
 
 ;;; Constants
 	CPU_FREQ = 16000000	; the frequency of the  CPU (16MHz)

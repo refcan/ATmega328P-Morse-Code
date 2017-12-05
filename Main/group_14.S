@@ -3,10 +3,12 @@
 ;;; REFERENCES:
 ;;; [ATmega328p] Section 15.11.7 p131 - http://www.atmel.com/Images/Atmel-7810-Automotive-Microcontrollers-ATmega328P_Datasheet.pdf
 
-;;; just including the standard symbol definitions of all ports:
-#define __SFR_OFFSET 0	; automatically subtracts 0x20 from I/O space addresses for compatibility
-#include <avr/io.h>		; including the standard symbol definitions of all ports
-#include "letters.S"	; import file with symbol definitions for the 7 segment display in order to set the correct pins as output in PORTD
+; automatically subtracts 0x20 from I/O space addresses for compatibility
+#define __SFR_OFFSET 0
+; including the standard symbol definitions of all ports
+#include <avr/io.h>
+; import file with symbol definitions for the 7 segment display in order to set the correct pins as output in PORTD
+#include "letters.S"
 
 ;;; Constants
 	CPU_FREQ = 16000000
@@ -47,7 +49,7 @@ main:
 
 	sei					; enable interrupts globally.
 	
-	lpm r24, CHAR_ERROR	; Load the error character to r24 to indicate there hasn't been any input, once the timer1 comparison interrupt kicks in it'll load in the display
+	ldi r24, CHAR_ERROR	; Load the error character to r24 to indicate there hasn't been any input, once the timer1 comparison interrupt kicks in it'll load in the display
 	clr r25				; initialise r25 as 0
 	
 wait: rjmp wait 		; wait for interrupts forever

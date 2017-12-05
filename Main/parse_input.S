@@ -21,7 +21,6 @@ parse_input:
     ;; saving the registers we'll be using in the subroutine
     push r20
     push r21
-    push r22
     push r30		; save Z reg low
 	push r31        ; save Z reg hi
 
@@ -32,33 +31,22 @@ loop:
     ldi r30, lo8(letter_table) ; make Z point to the table with the digits.
 	ldi r31, hi8(letter_table)
 
-    mov r21, r20    ; r20 is an iterator, r21 will handle the offset
-
-    add r30, r21    ; r21 is the offset into the table
+    add r30, r20    ; r21 is the offset into the table
     brcc 1f         ; if we have no overflow in low byte of Z pointer when adding the offset, continue
     inc r31         ; else add the overflow to the high byte of Z
 
-1:  lpm r22, Z      ; load data from the table to r22 for comparison purposes
-    cp r22, r25     ; compare pattern length
+1:  lpm r21, Z      ; load data from the table to r22 for comparison purposes
+    cp r21, r25     ; compare pattern length
     brne incr       ; if it's not what we're looking for go to incr label
 
-    subi r21, -26   ; add 26 to r21 to get to the second pseudo-row
-    add r30, r21    ; adjust the Z pointer accordingly (add offset and handle the overflow)
-    brcc 1f      
-    inc r31
-
-1:  lpm r22, Z
-    cp r22, r24      ; check if the morse code value is the same too
+    adiw r30, 26
+    lpm r21, Z
+    cp r21, r24      ; check if the morse code value is the same too
     brne incr
 
-    ;; if we've reached this segment, that means we've found what we're looking for, so it's time to output
-    subi r21, -26   ; go to the third pseudo-row
-    add r30, r21    ; adjust the Z pointer accordingly (add offset and handle the overflow)
-    brcc 1f
-    inc r31
-
-1:  lpm r24, Z       ; load the 7 segment representation of the letter into r24
-    rjmp end         ; end the subroutine
+    adiw r30, 26
+    lpm r24, Z
+    rjmp end
 
     ;; This label just handles what to do if we haven't found what we're looking for
 incr:
@@ -74,7 +62,6 @@ end:
     ;; restoring the registers
     pop r31
     pop r30
-    pop r22
     pop r21
     pop r20
 
@@ -86,5 +73,5 @@ end:
 ;; Third pseudo-row will be pointing to the 7seg representation
 letter_table:
     .byte 2, 4, 4, 3, 1, 4, 3, 4, 2, 4, 3, 4, 2, 2, 3, 4, 4, 3, 3, 1, 3, 4, 3, 4, 4, 4
-    .byte 0x1, 0x8, 0xA, 0x4, 0x0, 0x2, 0x6, 0x0, 0x0, 0x7, 0x5, 0x4, 0x3, 0x2, 0x7, 0x6, 0xD, 0x2, 0x0, 0x1, 0x1, 0x1, 0x3, 0x9, 0xB, 0xC
+    .byte 0x2, 0x1, 0x5, 0x1, 0x0, 0x4, 0x3, 0x0, 0x0, 0xE, 0x5, 0x2, 0x3, 0x1, 0x7, 0x6, 0xB, 0x2, 0x0, 0x1, 0x4, 0x8, 0x6, 0x9, 0xD, 0x3
     .byte CHAR_A, CHAR_B, CHAR_C, CHAR_D, CHAR_E, CHAR_F, CHAR_G, CHAR_H, CHAR_I, CHAR_J, CHAR_K, CHAR_L, CHAR_M, CHAR_N, CHAR_O, CHAR_P, CHAR_Q, CHAR_R, CHAR_S, CHAR_T, CHAR_U, CHAR_V, CHAR_W, CHAR_X, CHAR_Y, CHAR_Z

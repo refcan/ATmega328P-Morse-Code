@@ -213,8 +213,8 @@ s110:
     cpi r25, 3      ; if letter ends at 3 elements ( 2 dashes 1 dot )
     breq letter_g
     sbrs r24, 3
-    breq letter_z
-    breq letter_q
+    rjmp letter_z
+    rjmp letter_q
 
 letter_g:
     ldi r24, CHAR_G
