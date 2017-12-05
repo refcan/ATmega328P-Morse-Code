@@ -1,11 +1,22 @@
-;;; parse_input.S <date> <maintainerName(s)>
-;;; File to parse the input and display the right letter on screen
+;;; parse_input.S 29/11/2017 Evangelos (Angel) Chatzaroulas
+;;; File that looks through the input and determines what letter should be displayed
 ;;; REFERENCES:
 ;;; TODO
 #include <avr/io.h>
+
+;; import symbol definitions for the letter representations on the 7 segment display
 #include "letters.S"
 
-;; Convert a digit from some register into 7seg data
+;; This subroutine converts the morse code pattern into its letter representation in the 7 segment display.
+;; In particular it utilises a tree-like branching structure to intelligently parse the morse code pattern and end up at the corrent letter
+
+;; Input:
+;; r24 = the morse code pattern saved as a bit pattern where 1 is a dash and 0 is a dot
+;; r25 = a pointer to bit in r24 where a new dot or a dash would be written. This also happens to be the size of the pattern.
+
+;; Output:
+;; r24 = 7 segment representation of the letter denoted by the morse code pattern. If invalid, displays a dash
+
 .global parse_input
 parse_input:
     ;; Error Handling
