@@ -39,10 +39,15 @@ awaiting_release:
 	rjmp 1f
 
 awaiting_press:	
-		
-	out PORTD, r20		; display whatever's loaded in r20
-	
-1:	pop r16
+	cpi r25, 0
+	breq 2f
+	rcall parse_input
+
+2:	out PORTD, r24		; display whatever's loaded in r20
+
+1:	clr r25
+	;inc r25			; remnant of debugging bit pattern write
+	pop r16
 	out SREG, r16 		; restore status register
 	pop r16
 	
@@ -115,7 +120,11 @@ released:
 
 	push r16
 
-	tst r19 		; Did we have a timer overflow
+	cpi r25, 0		; if r25 is 1, reset r24
+	brne 1f
+	clr r24
+
+1:	tst r19 		; Did we have a timer overflow
 				; (ie more than TIMEOUT time since the
 				; last released of the button?
 	brne long_press		; if yes, then signal is a long
@@ -127,12 +136,37 @@ released:
 	brcs short_press
 	
 long_press:
-	ldi r20, CHAR_T
+	;ldi r20, CHAR_T
+	rcall set_mask
 	rjmp 1f
 
 short_press:
-	ldi r20, CHAR_E
+	rjmp 1f
 
-1:	pop r16
+1:	inc r25
+	pop r16
 	clr r19			; clear overflow flag in case it was set
 	ret
+
+set_mask:
+	push r0
+	push r16
+	push r2
+
+	clr r0
+	ldi r16, 0x1
+	mov r2, r25
+
+loop:
+	cp r2, r0
+	breq l_done
+	add r16, r16 ; bit shift left
+	dec r2
+	rjmp loop
+
+l_done:
+	or r24, r16
+	pop r2
+	pop r16
+	pop r0
+ 	ret 

@@ -8,211 +8,76 @@
 ;; Convert a digit from some register into 7seg data
 .global parse_input
 parse_input:
-    ;; Error Handling
-    cpi r25, 5     ; maximum length for a morse code letter is 4
-    breq error
+    ;; saving the registers we'll be using
+    push r20
+    push r21
+    push r22
+    push r30		; save Z reg low
+	push r31        ; save Z reg hi
 
-    ;; Parsing the input, by that I mean checking what pattern it has then jumping to appropriate letter
-    sbrs r24, 1     ; Check if the first element is a dash
-    rjmp s0         ; We're going to be using `s` at the start of labels and then 0 for dot 1 for dash according to dots / dashes
-    rjmp s1
+    clr r20         ; setting reg 20 to 0
 
-error:
-    ldi r24, CHAR_ERROR ; Display the Error pattern to the display
+    ;; loop through the table to find letter
+loop:
+    ldi r30, lo8(letter_table) ; make Z point to the table with the digits.
+	ldi r31, hi8(letter_table) 
+
+    mov r21, r20    ; r20 is an iterator, r21 will handle the offset
+    subi r21, -26   ; add 26 to r21 to get to the second pseudo-row
+
+    add r30, r21    ; r21 is the offset into the table
+    brcc 1f         ; if we have no overflow in low byte of Z pointer, continue
+    inc r31         ; else add the overflow to the high byte of Z
+
+1:  lpm r22, Z      ; load data from the table to r22 for comparison purposes
+    cp r22, r25     ; compare element length
+    brne incr       ; if it's not what we're looking for go to incr label
+
+    subi r21, -26   ; go to third pseudo-row
+    add r30, r21    ; adjust the Z pointer accordingly
+    brcc 1f      
+    inc r31
+
+1:  lpm r22, Z
+    cp r22, r24      ; check if the morse code value is the same too
+    brne incr
+
+    rjmp display     ; if this line is reached we've found what we're looking for, time to display
+
+incr:
+    cpi r20, 26     ; check if this is the end of the loop and we haven't found anything
+    brne 1f
+    ldi r24, CHAR_ERROR ; display error if we've iterated through the table and found nothing
     rjmp end
 
-;; dot branch
-s0: cpi r25, 2      ; if letter ends at 1 element (that's a dot)
-    breq letter_e
-    sbrs r24, 2
-    rjmp s00
-    rjmp s01
-    
-letter_e:
-    ldi r24, CHAR_E
-    rjmp end
+1:  inc r20         ; increment r20 and then go through the loop again
+    rjmp loop
 
-s00: 
-    cpi r25, 3      ; if letter ends at 2 elements (that are 2 dots)
-    breq letter_i
-    sbrs r24, 3
-    rjmp s000
-    rjmp s001
+display:
+    ldi r30, lo8(letter_table) ; Z pointer was altered to look through the table, reset it
+	ldi r31, hi8(letter_table) 
+    add r30, r20    ; add the offset
+    brcc 1f
+    inc r31
 
-letter_i:
-    ldi r24, CHAR_I
-    rjmp end
-
-s01:
-    cpi r25, 3      ; if letter ends at 2 elements (that are a dot and a dash)
-    breq letter_a
-    sbrs r24, 3
-    rjmp s010
-    rjmp s011
-
-letter_a:
-    ldi r24, CHAR_A
-    rjmp end
-
-s000:
-    cpi r25, 4      ; if letter ends at 3 elements (that are 3 dots)
-    breq letter_s
-    sbrs r24, 4
-    rjmp letter_h   ; only the letter h has 4 dots at all, no branching beyond that needed
-    rjmp letter_v   ; only the letter v has 3 dots and 1 dash at all
-
-letter_s:
-    ldi r24, CHAR_S
-    rjmp end
-
-letter_h:
-    ldi r24, CHAR_H
-    rjmp end
-
-letter_v:
-    ldi r24, CHAR_V
-    rjmp end
-
-s001:
-    cpi r25, 4      ; if letter ends at 3 elements (that are 2 dots 1 dash)
-    breq letter_u
-    rjmp letter_f   ; if we've reached this line, the only letter possible beyond is F
-
-letter_u:
-    ldi r24, CHAR_U
-    rjmp end
-
-letter_f:
-    ldi r24, CHAR_F
-    rjmp end
-
-s010:
-    cpi r25, 4      ; if letter ends at 3 elements (that are 1 dot 1 dash 1 dot)
-    breq letter_r
-    rjmp letter_l   ; if we've reached this line, the only letter possible beyond is L
-
-letter_r:
-    ldi r24, CHAR_R
-    rjmp end
-
-
-letter_l:
-    ldi r24, CHAR_L
-    rjmp end
-
-s011:
-    cpi r25, 4      ; if letter ends at 3 elements (that are 1 dot 2 dashes)
-    breq letter_w
-    sbrs r24, 4
-    rjmp letter_p   ; at dot-dash-dash-dot we have P
-    rjmp letter_j   ; at dot-dash-dash-dash we have J
-
-letter_w:
-    ldi r24, CHAR_W
-    rjmp end
-
-letter_p:
-    ldi r24, CHAR_P
-    rjmp end
-
-letter_j:
-    ldi r24, CHAR_J
-    rjmp end
-
-;; dash branch
-s1:
-    cpi r25, 2      ; if letter only has a dash
-    breq letter_t
-    sbrs r24, 2
-    rjmp s10
-    rjmp s11
-
-letter_t:
-    ldi r24, CHAR_T
-    rjmp end
-
-s10:
-    cpi r25, 3      ; if letter only has 2 elements (dash and dot)
-    breq letter_n
-    sbrs r24, 3
-    rjmp s100
-    rjmp s101
-
-letter_n:
-    ldi r24, CHAR_N
-    rjmp end
-
-s11:
-    cpi r25, 3      ; if letter only has 2 elements (2 dashes)
-    breq letter_m
-    sbrs r24, 3
-    rjmp s110
-    rjmp letter_o   ; only letter o has 3 consecutive dashes at all
-
-letter_m:
-    ldi r24, CHAR_M
-    rjmp end
-
-letter_o:
-    ldi r24, CHAR_O
-    rjmp end
-
-s100:
-    cpi r25, 4      ; if letter ends at 3 elements (1 dash 2 dots)
-    breq letter_d
-    sbrs r24, 4
-    rjmp letter_b   ; 1 dash 3 dots
-    rjmp letter_x   ; 1 dash 2 dots 1 dash
-
-letter_d:
-    ldi r24, CHAR_D
-    rjmp end
-
-letter_b:
-    ldi r24, CHAR_B
-    rjmp end
-
-letter_x:
-    ldi r24, CHAR_X
-    rjmp end
-
-s101:
-    cpi r25, 4      ; if letter ends at 3 elements (1 dash 1 dot 1 dash)
-    breq letter_k
-    sbrs r24, 4
-    rjmp letter_c   ; 1 dash 1 dot 1 dash 1 dot
-    rjmp letter_y   ; 1 dash 1 dot 2 dashes
-
-letter_k:
-    ldi r24, CHAR_K
-    rjmp end
-
-letter_c:
-    ldi r24, CHAR_C
-    rjmp end
-
-letter_y:
-    ldi r24, CHAR_Y
-    rjmp end
-
-s110:
-    cpi r25, 4      ; if letter ends at 3 elements ( 2 dashes 1 dot )
-    breq letter_g
-    sbrs r24, 4
-    breq letter_z
-    breq letter_q
-
-letter_g:
-    ldi r24, CHAR_G
-    rjmp end
-
-letter_z:
-    ldi r24, CHAR_Z
-    rjmp end
-
-letter_q:
-    ldi r24, CHAR_Q
+1:  lpm r24, Z
     rjmp end
 
 end:
+    ;; restoring the registers
+    pop r31
+    pop r30
+    pop r22
+    pop r21
+    pop r20
+
     ret
+
+;; This will sort of me a pseudo 2 dimentional table with 3 rows and 26 columns (one for each letter)
+;; First pseudo-row will be pointing to the 7seg representation, 
+;; second one to number of elements in the morse code pattern for it (plus one for comparison purposes with r25)
+;; third pseudo-row will be the value in hex if we think of the morse pattern as a bit pattern with 1 being dash 0 being dot
+letter_table:
+    .byte CHAR_A, CHAR_B, CHAR_C, CHAR_D, CHAR_E, CHAR_F, CHAR_G, CHAR_H, CHAR_I, CHAR_J, CHAR_K, CHAR_L, CHAR_M, CHAR_N, CHAR_O, CHAR_P, CHAR_Q, CHAR_R, CHAR_S, CHAR_T, CHAR_U, CHAR_V, CHAR_W, CHAR_X, CHAR_Y, CHAR_Z
+    .byte 3, 5, 5, 4, 2, 5, 4, 5, 3, 5, 4, 5, 3, 3, 4, 5, 5, 4, 4, 2, 4, 5, 4, 5, 5, 5
+    .byte 0x1, 0x8, 0xA, 0x4, 0x0, 0x2, 0x6, 0x0, 0x0, 0x7, 0x5, 0x4, 0x3, 0x2, 0x7, 0x6, 0xD, 0x2, 0x0, 0x1, 0x1, 0x1, 0x3, 0x9, 0xB, 0xC
