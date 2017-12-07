@@ -9,7 +9,6 @@ DOT = TICKS_PER_SEC / 10    ; 100ms
 DASH = 3 * DOT              ; 300ms
 SIGNAL_GAP = DOT            ; 100ms
 LETTER_GAP = 3 * DOT        ; 300ms
-WORD_GAP  = 7 * DOT         ; 700ms
 
     .global main
 main:
@@ -28,7 +27,6 @@ word_loop:
     ldi r30, lo8(message) ; loading the message to the Z pointer
     ldi r31, hi8(message)
 
-
 ;; loop to loop through the message and then send signal for each letter
 letter_loop:
     lpm r16, Z+ ; load next letter
@@ -45,6 +43,9 @@ end_word_loop:
 
 ;; Subroutine to send a signal for the letter
 send_letter_signal:
+    push r7
+    push r20
+    push r21
     push r22
     push r24
     push r30 ; we're going to point the Z pointer to the letter_table, so save the previous value
@@ -52,7 +53,7 @@ send_letter_signal:
 
     ldi r30, lo8(letter_table)
     ldi r31, hi8(letter_table)
-    
+
     subi r16, 0x41  ; remove the value of A, the first letter, to get the offset into the letter table
     add r30, r16    ; add the offset
     brcc 1f
@@ -61,7 +62,7 @@ send_letter_signal:
 1:  lpm r20, Z      ; r20 will be the length
     adiw r30, 26    ; add 26 to the Z pointer to go to pseudo-row 2
     lpm r7, Z       ; r7 will be the sequence
-    rcall make_mask ; prepare a r21
+    rcall make_mask ; prepare a bitmask on r21
 
 loop:
     sbi PORTB, 5    ; turn on bit 5 of PORTB
@@ -75,7 +76,7 @@ loop:
     brne 1f         ; if it's not it's a dash
 
     ldi r24, DOT    ; else it's a dot
-    rjmp 1f
+    rjmp 2f
 
 1:  ldi r24, DASH
 
@@ -98,6 +99,9 @@ end_signal:
     pop r30
     pop r24
     pop r22
+    pop r21
+    pop r20
+    pop r7
 
     ret
 
@@ -121,11 +125,11 @@ done:
     pop r17         ; restoring the register
  	ret
 
-;; The message string (.asciz denotes ascii string but with a trailing 0)
+;; The message string
 message:
-.asciz "ET"
+    .string "ET"
 
 ;; a table to hold the length and bit pattern of a letter, starting from A to Z
 letter_table:
-.byte 2, 4, 4, 3, 1, 4, 3, 4, 2, 4, 3, 4, 2, 2, 3, 4, 4, 3, 3, 1, 3, 4, 3, 4, 4, 4
-.byte 0x2, 0x1, 0x5, 0x1, 0x0, 0x4, 0x3, 0x0, 0x0, 0xE, 0x5, 0x2, 0x3, 0x1, 0x7, 0x6, 0xB, 0x2, 0x0, 0x1, 0x4, 0x8, 0x6, 0x9, 0xD, 0x3
+    .byte 2, 4, 4, 3, 1, 4, 3, 4, 2, 4, 3, 4, 2, 2, 3, 4, 4, 3, 3, 1, 3, 4, 3, 4, 4, 4
+    .byte 0x2, 0x1, 0x5, 0x1, 0x0, 0x4, 0x3, 0x0, 0x0, 0xE, 0x5, 0x2, 0x3, 0x1, 0x7, 0x6, 0xB, 0x2, 0x0, 0x1, 0x4, 0x8, 0x6, 0x9, 0xD, 0x3
