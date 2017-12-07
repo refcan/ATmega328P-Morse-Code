@@ -91,7 +91,7 @@ pressed:
 end_isr:
 	sts TCCR1B, r17 	; write r17's value in TTCR1B to change the edge detection properly
 
-	;; Basically just pop registers we used an return from the interrupt. Purpose of the extra debounce label is so we can exit if the time was lower than 16ms
+	;; Basically just pop registers we used and return from the interrupt. Purpose of the extra debounce label is so we can exit if the time was lower than 16ms
 debounce:
 	;; Restore the registers we used
 	pop r17
