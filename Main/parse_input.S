@@ -53,7 +53,7 @@ loop:
 
     ;; This label just handles what to do if we haven't found what we're looking for
 incr:
-    cpi r20, 25     ; check if this is the end of the loop and we haven't found anything
+    cpi r20, 25     ; check if this is the end of the loop and we haven't found anything (r20 counts from 0 to 25, so it counts 26 times in total)
     brne 1f
     ldi r24, CHAR_ERROR ; display error if we've iterated through the table and found nothing
     rjmp end        ; end the subroutine
@@ -69,6 +69,9 @@ end:
     pop r20
 
     ret
+
+;; * We are adding 26 to the current "index" (which is the Z pointer with the offset added) to get to the next pseudo-row
+;; because since each row has 26 elements, to get to the smae "column" in th next pseudo-row you would move 25 elements from your current one
 
 ;; This will sort of me a pseudo 2 dimentional table with 3 rows and 26 columns (one for each letter)
 ;; First pseudo-row will have the size of the morse code pattern 
