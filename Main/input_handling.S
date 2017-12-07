@@ -142,7 +142,7 @@ set_mask:
 loop:
 	cpi r17, 0			; if the bit we must set 1 to is 0, or r17 has been decremented enough times so no more shifting is needed
 	breq l_done			; we're done
-	add r16, r16 		; else do bitwise left shift on r16, moving the 1 into place
+	lsl r16				; else do bitwise left shift on r16, moving the 1 into place
 	dec r17				; decrement r17
 	rjmp loop
 
