@@ -2,13 +2,11 @@
 #include <avr/io.h>
 
 ;;; Constants
-CPU_FREQ = 16000000
-TICKS_PER_SEC = CPU_FREQ / (256 * 1024) ; 1000ms or 1 second
-
-DOT = TICKS_PER_SEC / 10    ; 100ms
-DASH = 3 * DOT              ; 300ms
-SIGNAL_GAP = DOT            ; 100ms
-LETTER_GAP = 3 * DOT        ; 300ms
+DOT = 10    ; 10cs
+DASH = 3 * DOT              ; 30cs / 3 dots
+SIGNAL_GAP = DOT            ; 10cs / 1 dot
+LETTER_GAP = 3 * DOT        ; 30cs / 3 dots
+WORD_GAP = 7 * DOT	    ; 70cs / 7 dots
 
     .global main
 main:
@@ -62,13 +60,12 @@ send_letter_signal:
 1:  lpm r20, Z      ; r20 will be the length
     adiw r30, 26    ; add 26 to the Z pointer to go to pseudo-row 2
     lpm r7, Z       ; r7 will be the sequence
-    rcall make_mask ; prepare a bitmask on r21
+    ldi r21, 0x1 ; prepare a bitmask on r21
 
 loop:
     sbi PORTB, 5    ; turn on bit 5 of PORTB
 
     dec r20         ; decrease the length
-    lsr r21         ; shift the bitmask to the right one bit
     mov r22, r7     ; load the sequence to r22 for comparison purposes
 
     and r22, r21
@@ -89,6 +86,7 @@ loop:
 
     cpi r20, 0      ; check if the length is 0 
     breq end_signal
+    lsl r21         ; shift the bitmask to the right one bit
     rjmp loop
 
 end_signal:
@@ -104,30 +102,10 @@ end_signal:
     pop r7
 
     ret
-
-
-;; Subroutine to prepare the bitmask
-make_mask:
-	;; Save the registers we'll be using
-	push r17			; r17 will be an iterator
     
-    ldi r21, 0x1    ; intialise the mask with 1 (0000 0001)
-    mov r17, r20    ; load the length to the iterator
-
-mask_loop:
-    cpi r17, 0      ; if we don't need to shift anymore
-    breq done       ; we're done
-    lsl r21         ; else do logical shift left on the mask
-    dec r17         ; decrement the iterator
-    rjmp mask_loop
-
-done:
-    pop r17         ; restoring the register
- 	ret
-
 ;; The message string
 message:
-    .string "ET"
+    .string "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 ;; a table to hold the length and bit pattern of a letter, starting from A to Z
 letter_table:
