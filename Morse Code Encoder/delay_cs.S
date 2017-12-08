@@ -30,7 +30,8 @@
 ;;;
 ;;; We want to delay in chunks of 1/100ms, so -- with 16MHz CPU
 ;;; frequency -- we need to burn 160000 clock ticks times the value of r24.
-	.balign 2	; We're using .asciz for strings in morse_test.S which means the trailing 0 is added automatically
+
+	.balign 2	; We're using .string for strings in morse_test.S which means the trailing 0 is added automatically
 				; and thus we have no control over if the string will be even or odd byte so
 				; to encsure that this subroutine is in reach we are going to use this assembler directive to add a padding byte to make sure it starts on an even byte
 	.section .text
