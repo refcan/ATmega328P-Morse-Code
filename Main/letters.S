@@ -1,8 +1,7 @@
 ;;; letters.S 1/12/2017 Daniel Pike
 ;;; File to declare letter representations for a 7-Segment Display
-;;; REFERENCES:
-;;; TODO
 
+; including the standard symbol definitions of all ports
 #include <avr/io.h>
 
     ;; The segments of the 7-Segment Display
@@ -30,19 +29,19 @@
 	CHAR_H = ~(_BV(SEG_B) | _BV(SEG_C) | _BV(SEG_E) | _BV(SEG_F) | _BV(SEG_G) )
 	CHAR_I = ~(_BV(SEG_E) | _BV(SEG_F) )
 	CHAR_J = ~(_BV(SEG_B) | _BV(SEG_C) | _BV(SEG_D) | _BV(SEG_E) )
-	CHAR_K = ~(_BV(SEG_B) | _BV(SEG_D) | _BV(SEG_E) | _BV(SEG_F) | _BV(SEG_G) ) ;; Strange
+	CHAR_K = ~(_BV(SEG_B) | _BV(SEG_D) | _BV(SEG_E) | _BV(SEG_F) | _BV(SEG_G) )
 	CHAR_L = ~(_BV(SEG_D) | _BV(SEG_E) | _BV(SEG_F) )
-	CHAR_M = ~(_BV(SEG_A) | _BV(SEG_C) | _BV(SEG_E) ) ;; Strange
+	CHAR_M = ~(_BV(SEG_A) | _BV(SEG_C) | _BV(SEG_E) )
 	CHAR_N = ~(_BV(SEG_A) | _BV(SEG_B) | _BV(SEG_C) | _BV(SEG_E) | _BV(SEG_F) )
 	CHAR_O = ~(_BV(SEG_A) | _BV(SEG_B) | _BV(SEG_C) | _BV(SEG_D) | _BV(SEG_E) | _BV(SEG_F) )
-	CHAR_P = ~(_BV(SEG_A) | _BV(SEG_B) |  _BV(SEG_E) | _BV(SEG_F) | _BV(SEG_G) )
+	CHAR_P = ~(_BV(SEG_A) | _BV(SEG_B) | _BV(SEG_E) | _BV(SEG_F) | _BV(SEG_G) )
 	CHAR_Q = ~(_BV(SEG_A) | _BV(SEG_B) | _BV(SEG_C) | _BV(SEG_F) | _BV(SEG_G) )
 	CHAR_R = ~(_BV(SEG_A) | _BV(SEG_E) | _BV(SEG_F) )
 	CHAR_S = ~(_BV(SEG_A) | _BV(SEG_C) | _BV(SEG_D) | _BV(SEG_F) | _BV(SEG_G) )
 	CHAR_T = ~(_BV(SEG_D) | _BV(SEG_E) | _BV(SEG_F) | _BV(SEG_G) )
 	CHAR_U = ~(_BV(SEG_B) | _BV(SEG_C) | _BV(SEG_D) | _BV(SEG_E) | _BV(SEG_F) )
 	CHAR_V = ~(_BV(SEG_C) | _BV(SEG_D) | _BV(SEG_E) )
-	CHAR_W = ~(_BV(SEG_B) | _BV(SEG_D) | _BV(SEG_F) ) ;; Strange
-	CHAR_X = ~(_BV(SEG_C) | _BV(SEG_F) | _BV(SEG_G) ) ;; Strange
+	CHAR_W = ~(_BV(SEG_B) | _BV(SEG_D) | _BV(SEG_F) )
+	CHAR_X = ~(_BV(SEG_C) | _BV(SEG_F) | _BV(SEG_G) )
 	CHAR_Y = ~(_BV(SEG_B) | _BV(SEG_C) | _BV(SEG_D) | _BV(SEG_F) | _BV(SEG_G) )
 	CHAR_Z = ~(_BV(SEG_A) | _BV(SEG_B) | _BV(SEG_D) | _BV(SEG_E) | _BV(SEG_G) )

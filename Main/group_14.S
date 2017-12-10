@@ -15,7 +15,7 @@
 	TICKS_PER_SEC = CPU_FREQ / (256 * 1024) ; 1000ms or 1 second
 
 	GAP_DECISION_LIMIT = 4 * TICKS_PER_SEC / 10   ; 400ms decision limit between inter-signal and inter-letter gap
-	INPUT_DECISION_LIMIT = 2 * TICKS_PER_SEC / 10 ; 200ms decision limit between dot and dash input | TODO: Might be redundant?
+	INPUT_DECISION_LIMIT = 2 * TICKS_PER_SEC / 10 ; 200ms decision limit between dot and dash input
 
 	BUTTON = 0
 

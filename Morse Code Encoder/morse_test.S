@@ -38,7 +38,7 @@ word_loop:
 
     ;; Note: A string is basically an array of characters represented by their ASCII values, stored in consecutive memory adresses, and the end character of a string is 0,
     ;; added automatically by the Assembler since we're using the .string Assembler pseudo-op.
-    ;; This means we can think of the string as a table and use the Z pointer accordingly to iterate through it, just like we would a table of letters.
+    ;; This means we can think of the string as a table and use the Z pointer accordingly to iterate through it, just like we would a table of letter representations in the main task of the coursework.
 
 ;; Loop to loop through the message and then send signal for each letter
 letter_loop:
@@ -78,7 +78,7 @@ send_letter_signal:
 1:  lpm r20, Z      ; r20 will be the length of the bit pattern corresponding to the morse code pattern of a letter, if it starts from Bit 0 and 0 is a dot, 1 is a dash.
     adiw r30, 26    ; add 26 to the Z pointer to go to pseudo-row 2
     lpm r7, Z       ; r7 will be the bit pattern itself
-    ldi r21, 0x1    ; prepare a bitmask on r21
+    ldi r21, 0x1    ; prepare a bitmask on r21, initial value being hex 1 (0000 0001 in binary)
 
 loop:
     sbi PORTB, 5    ; turn on bit 5 of PORTB to start the signal
@@ -122,6 +122,9 @@ end_signal:
 
     ret
     
+;; * The ascii value of the letter A is 0x41 and the rest of the capital leters have values increasing by 1 from that, B being 0x42 etc.
+;; So by removing the value of A from any ascii character, we get the offset of that letter from A, which is the offset into the table
+
 ;; The message string
 message:
     .string "ABCDEFGHIJKLMNOPQRSTUVWXYZ"

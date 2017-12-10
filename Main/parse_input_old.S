@@ -1,7 +1,7 @@
 ;;; parse_input.S 29/11/2017 Evangelos (Angel) Chatzaroulas
 ;;; File that looks through the input and determines what letter should be displayed
-;;; REFERENCES:
-;;; TODO
+
+; including the standard symbol definitions of all ports
 #include <avr/io.h>
 
 ;; import symbol definitions for the letter representations on the 7 segment display
