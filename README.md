@@ -1,5 +1,4 @@
-# Computer Logic Module Coursework - Group 14
-This is just a little repo to manage the source code of the coursework for the computer logic module.
+Simple Morse Code Decoder and Encoder fort he ATmega328P Microcontroller written in Assembly
 
 Here is an explanation of the files:
 
